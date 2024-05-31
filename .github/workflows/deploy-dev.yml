@@ -24,7 +24,7 @@ jobs:
         with:
           audience: sts.amazonaws.com
           aws-region: us-east-1
-          role-to-assume: "arn:aws:iam::791550794162:oidc-provider/token.actions.githubusercontent.com"
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
