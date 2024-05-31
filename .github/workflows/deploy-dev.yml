@@ -1,0 +1,18 @@
+name: Deploy Dev New
+
+on:
+  workflow_dispatch:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    environment: dev
+    name: deploy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - run: echo The PR was merged
+      - uses: actions/checkout@v3
