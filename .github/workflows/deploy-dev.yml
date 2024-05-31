@@ -3,36 +3,31 @@ name: Deploy Dev New
 on:
   workflow_dispatch:
     branches:
-      - main
+      - any
 
 jobs:
   deploy:
     environment: dev
     name: deploy
     runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    permissions:
+      id-token: write
+      contents: read
+
     strategy:
       matrix:
         node-version: [18.x]
     steps:
       - run: echo The PR was merged
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: sts.amazonaws.com
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::791550794162:oidc-provider/token.actions.githubusercontent.com
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Write .env.dev file
-        id: write_dev_env_file
-        uses: timheuer/base64-to-file@v1.1
-        with:
-          fileName: '.env.dev'
-          fileDir: './'
-          encodedString: ${{ secrets.DEV_ENV_FILE }}
-      - run: npm install
-      - run: npm run build
-      - name: install serverless
-        run: npm i -g serverless@3.38.0
-      - name: severless deploy
-        run: sls deploy --stage dev --verbose
+
