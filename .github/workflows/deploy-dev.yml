@@ -2,8 +2,7 @@ name: Deploy Dev New
 
 on:
   workflow_dispatch:
-    branches:
-      - any
+
 
 jobs:
   deploy:
@@ -30,4 +29,22 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Post to a Slack channel
+        id: slack
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          # Slack channel id, channel name, or user id to post message.
+          # See also: https://api.slack.com/methods/chat.postMessage#channels
+          channel-id: 'C03SCNJ5WCB'
+          # For posting a rich message using Block Kit
+          payload: |
+            {"channel":"C03SCNJ5WCB","attachments":[{"fallback":"TEST SBVT Backend Deployment","color":"good","pretext":"TEST SBVT Backend Deployment","fields":[{"title":"Author","value":"'"$AUTHOR"'","short":true},{"title":"Environment","value":"'"$env"'","short":true},{"title":"Status","value":"Running...","short":true},{"title":"Commit","value":"'"$commit_id"'","short":true},{"title":"Commit Message","value":"'"$commit_message"'","short":false}]}]}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          env: "dev"
+          AUTHOR: "yamini-sethu"
+          commit_id: "9a3c5a51ea35eb83cde19ec70f16c97bb1d54e38"
+          commit_message: "SBVT-2396 contract change"
+          
+          
 
