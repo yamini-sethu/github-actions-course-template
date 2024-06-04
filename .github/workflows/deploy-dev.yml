@@ -30,29 +30,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Post to a Slack channel
-        id: slack
-        uses: slackapi/slack-github-action@v1.26.0
-        with:
-          # Slack channel id, channel name, or user id to post message.
-          # See also: https://api.slack.com/methods/chat.postMessage#channels
-          channel-id: 'C03SCNJ5WCB'
-          # For posting a rich message using Block Kit
-          payload: |
-            {
-              "text": "TEST Deploy GitHub Action build result: ${{ job.status }}",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "GitHub Action build result: ${{ job.status }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
       - name: Post to a Slack channel222
         id: slack7
         uses: slackapi/slack-github-action@v1.26.0
@@ -111,7 +89,6 @@ jobs:
                 AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                 AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
                 SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-                env: dev
                 AUTHOR: yamini-sethu
                 commit_id: 9a3c5a51ea35eb83cde19ec70f16c97bb1d54e38
                 commit_message: SBVT-2396 contract change
