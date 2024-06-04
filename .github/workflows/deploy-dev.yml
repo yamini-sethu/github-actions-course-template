@@ -39,58 +39,58 @@ jobs:
           # For posting a rich message using Block Kit
           payload: |
             - name: Notify Slack
-  uses: slackapi/slack-github-action@v1.26.0
-  with:
-    channel-id: C03SCNJ5WCB
-    payload: >
-      {
-        "channel": "C03SCNJ5WCB",
-        "attachments": [
-          {
-            "fallback": "TEST SBVT Backend Deployment",
-            "color": "good",
-            "pretext": "TEST SBVT Backend Deployment",
-            "fields": [
-              {
-                "title": "Author",
-                "value": "${{ env.AUTHOR }}",
-                "short": true
-              },
-              {
-                "title": "Environment",
-                "value": "${{ env.env }}",
-                "short": true
-              },
-              {
-                "title": "Status",
-                "value": "Running...",
-                "short": true
-              },
-              {
-                "title": "Commit",
-                "value": "${{ env.commit_id }}",
-                "short": true
-              },
-              {
-                "title": "Commit Message",
-                "value": "${{ env.commit_message }}",
-                "short": false
-              }
-            ]
-          }
-        ]
-      }
-  env:
-    AWS_DEFAULT_REGION: us-east-1
-    AWS_REGION: us-east-1
-    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-    SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-    env: dev
-    AUTHOR: yamini-sethu
-    commit_id: 9a3c5a51ea35eb83cde19ec70f16c97bb1d54e38
-    commit_message: SBVT-2396 contract change
+              uses: slackapi/slack-github-action@v1.26.0
+              with:
+                channel-id: C03SCNJ5WCB
+                payload: >
+                  {
+                    "channel": "C03SCNJ5WCB",
+                    "attachments": [
+                      {
+                        "fallback": "TEST SBVT Backend Deployment",
+                        "color": "good",
+                        "pretext": "TEST SBVT Backend Deployment",
+                        "fields": [
+                          {
+                            "title": "Author",
+                            "value": "${{ env.AUTHOR }}",
+                            "short": true
+                          },
+                          {
+                            "title": "Environment",
+                            "value": "${{ env.env }}",
+                            "short": true
+                          },
+                          {
+                            "title": "Status",
+                            "value": "Running...",
+                            "short": true
+                          },
+                          {
+                            "title": "Commit",
+                            "value": "${{ env.commit_id }}",
+                            "short": true
+                          },
+                          {
+                            "title": "Commit Message",
+                            "value": "${{ env.commit_message }}",
+                            "short": false
+                          }
+                        ]
+                      }
+                    ]
+                  }
+              env:
+                AWS_DEFAULT_REGION: us-east-1
+                AWS_REGION: us-east-1
+                AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+                SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+                env: dev
+                AUTHOR: yamini-sethu
+                commit_id: 9a3c5a51ea35eb83cde19ec70f16c97bb1d54e38
+                commit_message: SBVT-2396 contract change
           
           
 
