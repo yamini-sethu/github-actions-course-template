@@ -91,13 +91,6 @@ jobs:
     AUTHOR: yamini-sethu
     commit_id: 9a3c5a51ea35eb83cde19ec70f16c97bb1d54e38
     commit_message: SBVT-2396 contract change
-
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          env: "dev"
-          AUTHOR: "yamini-sethu"
-          commit_id: "9a3c5a51ea35eb83cde19ec70f16c97bb1d54e38"
-          commit_message: "SBVT-2396 contract change"
           
           
 
