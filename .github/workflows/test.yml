@@ -1,0 +1,196 @@
+name: Test GH
+
+on:
+  workflow_dispatch:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    environment: dev
+    name: deploy
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      env: dev
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - run: echo "Deploying Backend" 
+      - name: Prepare build info
+        id: build-start
+        if: always()
+        run: |
+          echo "value=$(date +%s%N | cut -b1-13)" >> $GITHUB_OUTPUT
+      - name: Set environment variable based on condition
+        id: set-env-var
+        run: |
+          echo "PARAM_FILE=.env.$env" >> $GITHUB_ENV
+          if [ "$env" = "dev" ]; then
+            echo "FAROS_ENV=Dev" >> $GITHUB_ENV
+
+          elif [ "$env" = "int" ]; then
+            echo "FAROS_ENV=QA" >> $GITHUB_ENV
+          else
+            echo "FAROS_ENV=Prod" >> $GITHUB_ENV
+          fi
+
+      
+      - name: Use the environment variable in another step
+        run: |
+          echo "The FAROS_ENV is $FAROS_ENV"
+          echo "The PARAM_FILE is $PARAM_FILE"
+        env:
+          FAROS_ENV: ${{ env.FAROS_ENV }}
+
+
+            
+      - name: Installing libraries/Dependencies    
+        run: |        
+          echo "Installing libraries"
+          sudo apt-get update -y 
+          sudo apt-get -y install curl jq npm        
+          echo "Installing backend Dependencies"
+          npm install -g serverless@3.38.0 
+
+
+      - uses: actions/checkout@v4
+
+      - name: Retrieving commit details for Slack Notification
+        id: slack7
+        run: |
+          COMMIT_INFO=$(git log -1 --pretty=format:'{"commit_id": "%H", "author": "%an", "message": "%s"}')
+          echo "COMMIT_ID=$(echo $COMMIT_INFO | jq -r '.commit_id')" >> $GITHUB_ENV
+          echo "AUTHOR=$(echo $COMMIT_INFO | jq -r '.author')" >> $GITHUB_ENV 
+          echo "COMMIT_MESSAGE=$(echo $COMMIT_INFO | jq -r '.message')" >> $GITHUB_ENV
+          echo $COMMIT_INFO | jq -r '.commit_id' >> $GITHUB_ENV
+          echo $COMMIT_INFO | jq -r '.author' >> $GITHUB_ENV
+          echo $COMMIT_INFO | jq -r '.message' >> $GITHUB_ENV
+
+      - name: Post to a Slack channel
+        id: slack7
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          channel-id: 'C03SCNJ5WCB'
+          payload: |
+            {
+              "attachments": [
+                {
+                  "fallback": "TEST SBVT Backend Deployment",
+                  "color": "good",
+                  "pretext": "TEST SBVT Backend Deployment",
+                  "fields": [
+                    {
+                      "title": "Author",
+                      "value": "${{ env.AUTHOR }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Environment",
+                      "value": "$env",
+                      "short": true
+                    },
+                    {
+                      "title": "Status",
+                      "value": "Running...",
+                      "short": true
+                    },
+                    {
+                      "title": "Commit",
+                      "value": "${{ env.COMMIT_ID }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Commit Message",
+                      "value": "${{ env.COMMIT_MESSAGE }}",
+                      "short": false
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+
+      - name: Decode and Write Env file 
+        id: decode-base64
+        run: |
+          echo $BASE64_STRING | base64 --decode > decoded_file.txt
+        env:
+          BASE64_STRING: ${{ secrets.DEV_ENV_FILE }}
+
+      - name: Display file contents
+        run: cat decoded_file.txt
+
+      - name: run build
+        run: npm run build
+
+      - name: Finish build info
+        id: build-end
+        if: always()
+        run: |
+          echo "value=$NOW" >> $GITHUB_OUTPUT
+      - name: Send event to faros
+        id: send-ci-event
+        if: always()
+        uses: faros-ai/faros-cicd-github-action@v3.0.8
+        with:
+          api-key: ${{ secrets.FAROS_API_KEY }}
+          event: CI
+          run-started-at: ${{ steps.build-start.outputs.value }}
+          run-ended-at: ${{ steps.build-end.outputs.value }}
+          run-status: ${{ job.status }}
+
+      - name: Prepare deploy info
+        id: deploy-start
+        run: |
+          echo "value=$(date +%s%N | cut -b1-13)" >> $GITHUB_OUTPUT
+          echo "env: $env"
+      - name: severless deploy
+        run: sls deploy --stage $env --verbose   
+      - name: Finish deploy info
+        id: deploy-end
+        if: always()
+        run: |
+          echo "value=$NOW" >> $GITHUB_OUTPUT   
+      - name: Report deployment to Faros
+        id: send-cd-event
+        if: always()
+        uses: faros-ai/faros-cicd-github-action@v3.0.8
+        with:
+          api-key: ${{ secrets.FAROS_API_KEY }}
+          event: CD
+          deploy: GitHub://VisualTest-Backend/$env/$GITHUB_RUN_ID
+          deploy-status: ${{ job.status }}
+          deploy-started-at: ${{ steps.deploy-start.outputs.value }}
+          deploy-ended-at: ${{ steps.deploy-end.outputs.value }}
+          run-status: ${{ job.status }}
+          run-started-at: ${{ steps.deploy-start.outputs.value }}
+          run-ended-at: ${{ steps.deploy-end.outputs.value }}
+      - name: Check job status and construct JSON
+        id: job-status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            SLACK_JSON='{"channel":"C03SCNJ5WCB","attachments":[{"fallback":"TEST SBVT Backend Deployment","color":"danger","pretext":"TEST SBVT Backend Deployment","fields":[{"title":"Author","value":"'"$AUTHOR"'","short":true},{"title":"Environment","value":"'"$env"'","short":true},{"title":"Status","value":"FAILED in Deployment","short":true},{"title":"Commit","value":"'"$COMMIT_ID"'","short":true},{"title":"Commit Message","value":"'"$COMMIT_MESSAGE"'","short":false}]}]}'
+            
+          else
+            SLACK_JSON='{"channel":"C03SCNJ5WCB","attachments":[{"fallback":"TEST SBVT Backend Deployment","color":"good","pretext":"TEST SBVT Backend Deployment","fields":[{"title":"Author","value":"'"$AUTHOR"'","short":true},{"title":"Environment","value":"'"$env"'","short":true},{"title":"Status","value":"OK","short":true},{"title":"Commit","value":"'"$COMMIT_ID"'","short":true},{"title":"Commit Message","value":"'"$COMMIT_MESSAGE"'","short":false}]}]}'
+          fi
+          echo "SLACK_JSON=$SLACK_JSON" >> $GITHUB_ENV
+
+      - name: Display JSON results
+        run: |
+          echo "Success JSON: $SUCCESS_JSON"
+          echo "Error JSON: $ERROR_JSON"
+        env:
+          SUCCESS_JSON: ${{ env.SUCCESS_JSON }}
+          ERROR_JSON: ${{ env.ERROR_JSON }}
