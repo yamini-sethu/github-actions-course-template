@@ -38,9 +38,13 @@ jobs:
         id: getSecret
       - name: Decode and Write Env file 
         run: |  
+          echo "printing secret from ENV"
+          echo "${{ env.backend_param_file }}"
+          echo "printing secret from output"
+          echo "${{ steps.getSecret.outputs.backend_param_file }}"
           echo "${{ env.backend_param_file }}"  | jq --raw-output '.SecretString'| jq --raw-output '.prod_env_file' | base64 --decode > param_file
           cat param_file
-          echo "${{ steps.getSecret.outputs.backend_param_file }}"  | jq --raw-output '.SecretString'| jq --raw-output '.prod_env_file' | base64 - -decode > PARAM_FILE1
+          echo "${{ steps.getSecret.outputs.backend_param_file }}"  | jq --raw-output '.SecretString'| jq --raw-output '.prod_env_file' | base64 --decode > PARAM_FILE1
           cat PARAM_FILE1
       
 
