@@ -32,10 +32,10 @@ jobs:
       - name: Retrieve Secret from AWS Secret Manager and Write to Env File
         uses: aws-actions/aws-secretsmanager-get-secrets@v2
         with:
-          secrets: |
-              serverless1
-
-              
+          secret-ids: |
+              serverless
+              backend_param_file
+          name-transformation: none              
 
         id: getSecret
       - name: Decode and Write Env file 
@@ -43,6 +43,7 @@ jobs:
           API_KEY=`aws secretsmanager get-secret-value --secret-id backend_param_file --region us-east-1 | jq --raw-output '.SecretString'| jq --raw-output '.prod_env_file'`
           echo "$API_KEY"
           echo "printing secret from ENV"
+          echo "${{ env.serverless }}"
           echo "${{ env.backend_param_file }}"
           echo "${{ env.BACKEND_PARAM_FILE }}"
           echo "${{ env.SECRET_ALIAS_1 }}"
@@ -51,7 +52,7 @@ jobs:
           echo "${{ env.SERVERLESS }}"
           echo "printing secret from output"
           echo "${{ steps.getSecret.outputs.serverless }}"
-          echo "${{ steps.getSecret.outputs.SERVERLESS }}"
+          echo "${{ steps.getSecret.outputs.backend_param_file }}"
           echo "${{ steps.getSecret.outputs.backend_param_file }}"
           echo "${{ steps.getSecret.outputs.BACKEND_PARAM_FILE }}"
           echo "${{ steps.getSecret.outputs.SECRET_ALIAS_1 }}"
