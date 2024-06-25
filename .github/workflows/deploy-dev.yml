@@ -32,8 +32,8 @@ jobs:
       - name: Retrieve Secret from AWS Secret Manager and Write to Env File
         uses: aws-actions/aws-secretsmanager-get-secrets@v2
         with:
-          secrets: |
-            backend_param_file
+          secrets: backend_param_file
+          name-transformation: lowercase
 
         id: getSecret
       - name: Decode and Write Env file 
