@@ -33,12 +33,8 @@ jobs:
         uses: aws-actions/aws-secretsmanager-get-secrets@v2
         with:
           secrets: |
-              serverless
-              backend_param_file
-              param_file
-              SECRET_ALIAS_1,param_file
-              SECRET_ALIAS_2,backend_param_file
-          parse-json-secrets: false
+              serverless1
+
               
 
         id: getSecret
