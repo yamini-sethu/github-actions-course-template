@@ -40,8 +40,8 @@ jobs:
         run: |  
           echo "${{ env.backend_param_file }}"  | jq --raw-output '.SecretString'| jq --raw-output '.prod_env_file' | base64 --decode > param_file
           cat param_file
-          echo "${{ steps.getSecret.outputs.backend_param_file }}"  | jq --raw-output '.SecretString'| jq --raw-output '.prod_env_file' | base64 - -decode > $PARAM_FILE
-          cat $PARAM_FILE
+          echo "${{ steps.getSecret.outputs.backend_param_file }}"  | jq --raw-output '.SecretString'| jq --raw-output '.prod_env_file' | base64 - -decode > PARAM_FILE1
+          cat PARAM_FILE1
       
 
 
