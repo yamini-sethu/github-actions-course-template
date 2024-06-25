@@ -38,6 +38,8 @@ jobs:
         id: getSecret
       - name: Decode and Write Env file 
         run: |  
+          API_KEY=`aws secretsmanager get-secret-value --secret-id backend_param_file --region us-east-1 | jq --raw-output '.SecretString'| jq --raw-output '.prod_env_file'`
+          echo "$API_KEY"
           echo "printing secret from ENV"
           echo "${{ env.backend_param_file }}"
           echo "printing secret from output"
