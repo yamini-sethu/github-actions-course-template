@@ -36,7 +36,7 @@ jobs:
               serverless
               backend_param_file
           name-transformation: none
-          parse-json-secrets: none
+          parse-json-secrets: false
 
         id: getSecret
       - name: Decode and Write Env file 
