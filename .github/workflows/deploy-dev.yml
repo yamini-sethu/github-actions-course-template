@@ -42,23 +42,9 @@ jobs:
       - name: Decode and Write Env file 
         run: |  
           SECRET_KEY=".prod_env_file"
-          echo ${{ env.backend_param_file_dev_env_file }}  | base64 --decode > .env_back
+          echo ${{ env.backend_param_file_prod_env_file }}  | base64 --decode > .env_back
           cat .env_back
-          echo "${{ steps.getSecret.outputs.backend_param_file }}" | jq --raw-output '.SecretString' | jq --raw-output '.prod_env_file'
-          SECRET=$(echo "${{ steps.getSecret.outputs.backend_param_file }}" | jq --raw-output '.SecretString' | jq --raw-output '.prod_env_file')
-          echo "Decoded secret: $SECRET"
-          echo $backend_param_file > .env_prod1
-          cat .env_prod1
-          echo $backend_param_file | jq --raw-output '.SecretString'
-          SECRET_STRING=$(echo "$backend_param_file" | jq --raw-output '.SecretString')
-          echo "Secret string: $SECRET_STRING"
-          SECRET=$(echo "$SECRET_STRING" | jq --raw-output ".${SECRET_KEY}")
-          echo "Decoded secret: $SECRET"
-          echo "$SECRET" | base64 --decode > PARAM_FILE
-          cat PARAM_FILE
-          SECRET=`aws secretsmanager get-secret-value --secret-id backend_param_file --region us-east-1 | jq --raw-output '.SecretString'| jq --raw-output ".$SECRET_KEY"`
-          echo $API_KEY | base64 --decode > .env_prod
-          cat .env_prod
+
         env: 
           backend_param_file: ${{ env.backend_param_file }}
 
