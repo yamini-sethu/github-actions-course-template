@@ -46,7 +46,7 @@ jobs:
           #echo $API_KEY | base64 --decode > .env_prod
           #cat .env_prod
           echo $backend_param_file
-          echo $backend_param_file" | jq --raw-output '.SecretString'
+          echo $backend_param_file | jq --raw-output '.SecretString'
           SECRET_STRING=$(echo "$backend_param_file" | jq --raw-output '.SecretString')
           echo "Secret string: $SECRET_STRING"
           SECRET=$(echo "$SECRET_STRING" | jq --raw-output ".${SECRET_KEY}")
