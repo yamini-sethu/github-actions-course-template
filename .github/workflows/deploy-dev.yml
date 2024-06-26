@@ -42,29 +42,9 @@ jobs:
         run: |  
           SECRET_KEY="prod_env_file"
           API_KEY=`aws secretsmanager get-secret-value --secret-id backend_param_file --region us-east-1 | jq --raw-output '.SecretString'| jq --raw-output ".$SECRET_KEY"`
-          echo "$API_KEY" | base64 -d > .env_prod
+          echo "$API_KEY" | base64 --decode > .env_prod
           cat .env_prod
-          echo "printing secret from ENV"
-          echo "${{ env.serverless }}"
-          echo "${{ env.backend_param_file }}"
-          echo "${{ env.BACKEND_PARAM_FILE }}"
-          echo "${{ env.SECRET_ALIAS_1 }}"
-          echo "${{ env.SECRET_ALIAS_2 }}"
-          echo "${{ env.serverless }}"
-          echo "${{ env.SERVERLESS }}"
-          echo "printing secret from output"
-          echo "${{ steps.getSecret.outputs.serverless }}"
-          echo "${{ steps.getSecret.outputs.backend_param_file }}"
-          echo "${{ steps.getSecret.outputs.backend_param_file }}"
-          echo "${{ steps.getSecret.outputs.BACKEND_PARAM_FILE }}"
-          echo "${{ steps.getSecret.outputs.SECRET_ALIAS_1 }}"
-          echo "${{ steps.getSecret.outputs.SECRET_ALIAS_2 }}"
-          echo "${{ steps.getSecret.outputs.serverless }}"
-          echo "${{ steps.getSecret.outputs.SERVERLESS }}"
-          echo "${{ env.backend_param_file }}"  | jq --raw-output '.SecretString'| jq --raw-output '.prod_env_file' | base64 --decode > param_file
-          cat param_file
-          echo "${{ steps.getSecret.outputs.backend_param_file }}"  | jq --raw-output '.SecretString'| jq --raw-output '.prod_env_file' | base64 --decode > PARAM_FILE1
-          cat PARAM_FILE1
+
       
 
 
