@@ -36,12 +36,14 @@ jobs:
               serverless
               backend_param_file
           name-transformation: none
-          parse-json-secrets: false
+          parse-json-secrets: true
 
         id: getSecret
       - name: Decode and Write Env file 
         run: |  
           SECRET_KEY=".prod_env_file"
+          echo ${{ env.backend_param_file_dev_env_file }}  | base64 --decode > .env_back
+          cat .env_back
           echo "${{ steps.getSecret.outputs.backend_param_file }}" | jq --raw-output '.SecretString' | jq --raw-output '.prod_env_file'
           SECRET=$(echo "${{ steps.getSecret.outputs.backend_param_file }}" | jq --raw-output '.SecretString' | jq --raw-output '.prod_env_file')
           echo "Decoded secret: $SECRET"
