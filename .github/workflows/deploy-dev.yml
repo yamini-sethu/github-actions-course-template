@@ -35,7 +35,8 @@ jobs:
           secret-ids: |
               serverless
               backend_param_file
-          name-transformation: none              
+          name-transformation: none
+          parse-json-secrets: none
 
         id: getSecret
       - name: Decode and Write Env file 
