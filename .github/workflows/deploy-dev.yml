@@ -48,6 +48,18 @@ jobs:
         env: 
           backend_param_file: ${{ env.backend_param_file }}
 
+
+  bash-example:
+    runs-on: ubuntu-latest
+    env:
+      MY_NAME: "Mona The Octocat"
+    steps:
+      - name: bash-version
+        run: |
+          echo "$MY_NAME"
+          echo "::add-mask::$MY_NAME"
+
+
       
 
 
