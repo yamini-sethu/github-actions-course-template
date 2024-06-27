@@ -53,10 +53,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MY_NAME: "Mona The Octocat"
+      MY_NAME1: "Me The Octocat"
     steps:
       - name: bash-version
         run: |
-          echo "$MY_NAME"
+          echo "$MY_NAME1"         
           echo "::add-mask::$MY_NAME"
 
 
