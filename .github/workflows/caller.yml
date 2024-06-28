@@ -8,7 +8,7 @@ on:
 
 jobs:
   call-workflow:
-    uses: yamini-sethu/github-actions-course-template/.github/workflows/reusable-workflow.yml@main
+    uses: yamini-sethu/github-actions-course-template/.github/workflows/reusable-workflow.yml@master
     with:
       deployment_environment: dev      
     secrets:
