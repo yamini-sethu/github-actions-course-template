@@ -1,9 +1,10 @@
 name: Call a reusable workflow
 
 on:
-  pull_request:
-    branches:
-      - master
+    workflow_dispatch:
+    push:
+        branches:
+            - master
 
 jobs:
   call-workflow:
