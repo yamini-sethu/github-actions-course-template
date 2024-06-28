@@ -7,9 +7,9 @@ on:
             - master
 
 jobs:
-  call-workflow:
+  deploy:
     uses: yamini-sethu/github-actions-course-template/.github/workflows/reusable-workflow.yml@master
     with:
-      deployment_environment: dev      
-    secrets:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        env: dev      
+    secrets: inherit
+        

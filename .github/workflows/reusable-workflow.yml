@@ -3,7 +3,7 @@ name: Reusable workflow example
 on:
   workflow_call:
     inputs:
-      deployment_environment:
+      env:
         required: true
         type: string
     secrets:
@@ -11,12 +11,12 @@ on:
         required: true
 
 jobs:
-  deploy:
+  deploy_call:
     environment: ${{ inputs.deployment_environment }}
     name: deploy
     runs-on: ubuntu-latest
     permissions:
-      id-token: none
+      id-token: write
       contents: read
 
     strategy:
@@ -29,7 +29,7 @@ jobs:
         with:
           audience: sts.amazonaws.com
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::791550794162:role/sbvt-backend-temp-aws-credential-generator-Role-Mprb7kTyc9zq
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
@@ -47,8 +47,10 @@ jobs:
       - name: Decode and Write Env file 
         run: |  
           SECRET_KEY=".prod_env_file"
-          echo ${{ env.BUILD_SECRETS }}  | base64 --decode > .env_back
+          echo ${{ env.backend_param_file_prod_env_file }}  | base64 --decode > .env_back
+          echo ${{ env.BUILD_SECRETS }}  | base64 --decode > .env_back1
           cat .env_back
+          cat .env_back1
         env:
           BUILD_SECRETS: ${{ secrets[format('backend_param_file_{0}_env_file', inputs.deployment_environment)] }}
  
