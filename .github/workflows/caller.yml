@@ -1,0 +1,14 @@
+name: Call a reusable workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  call-workflow:
+    uses: yamini-sethu/github-actions-course-template/.github/workflows/reusable-workflow.yml@main
+    with:
+      deployment_environment: dev      
+    secrets:
+        token: ${{ secrets.GITHUB_TOKEN }}
