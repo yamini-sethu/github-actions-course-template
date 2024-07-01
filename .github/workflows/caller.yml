@@ -46,14 +46,10 @@ jobs:
           commit-message: ${{ steps.commit-info.outputs.commit-info.COMMIT_MESSAGE }}
           commit-id: ${{ steps.commit-info.outputs.commit-info.COMMIT_ID }}
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-          env-name: ${{ env.ENV_NAME }}
+          env-name: 'dev'
           update-slack: 'false'
 
 
-  deploy:
-    uses: ./.github/workflows/reusable-workflow.yml
-    with:
-      env: ${{ steps.set-env.outputs.env }}
-    secrets: inherit
+
       
         
