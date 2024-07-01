@@ -23,7 +23,7 @@ jobs:
 
       - name: Post to Slack
         id: post_slack
-        uses: ./.github/actions/post-slack-custom@master
+        uses: ./actions/post-slack-custom
         with:
           commit-author: ${{ steps.commit-info.outputs.commit-info.AUTHOR }}
           commit-message: ${{ steps.commit-info.outputs.commit-info.COMMIT_MESSAGE }}
