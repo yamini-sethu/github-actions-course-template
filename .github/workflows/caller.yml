@@ -7,9 +7,53 @@ on:
             - master
 
 jobs:
+  set-env:
+    environment: dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set environment variable
+        id: set-env
+        run: echo "::set-output name=env::dev"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: sts.amazonaws.com
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+
+      - name: Retrieve Secret from AWS Secret Manager and Write to Env File
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+            secret-ids: |
+                backend_param_file
+            name-transformation: none
+            parse-json-secrets: true
+        id: getSecret
+
+      - name: Retrieving commit details for Slack Notification
+        id: commit-info
+        run: |
+          COMMIT_INFO=$(git log -1 --pretty=format:'{"commit_id": "%H", "author": "%an", "message": "%s"}')
+          echo "COMMIT_ID=$(echo $COMMIT_INFO | jq -r '.commit_id')" >> $GITHUB_OUTPUT
+          echo "AUTHOR=$(echo $COMMIT_INFO | jq -r '.author')" >> $GITHUB_OUTPUT 
+          echo "COMMIT_MESSAGE=$(echo $COMMIT_INFO | jq -r '.message')" >> $GITHUB_OUTPUT
+
+      - name: Post to Slack
+        id: post_slack
+        uses: ./post-slack-custom@master
+        with:
+          commit-author: ${{ steps.commit-info.outputs.commit-info.AUTHOR }}
+          commit-message: ${{ steps.commit-info.outputs.commit-info.COMMIT_MESSAGE }}
+          commit-id: ${{ steps.commit-info.outputs.commit-info.COMMIT_ID }}
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          env-name: ${{ env.ENV_NAME }}
+          update-slack: 'false'
+
+
   deploy:
-    uses: yamini-sethu/github-actions-course-template/.github/workflows/reusable-workflow.yml@master
+    uses: ./.github/workflows/reusable-workflow.yml
     with:
-        env: dev      
+      env: ${{ steps.set-env.outputs.env }}
     secrets: inherit
+      
         
