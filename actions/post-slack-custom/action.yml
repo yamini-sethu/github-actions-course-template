@@ -31,12 +31,9 @@ inputs:
     description: 'Timestamp of the original Slack message'
     required: false
 
-
-
 runs:
   using: 'composite'
   steps:
-    
     - name: Post to Slack channel
       if: ${{ inputs.update-slack == 'false' }}
       id: slack
@@ -44,64 +41,62 @@ runs:
       with:
         channel-id: ${{ inputs.channel-id }}
         payload: |
-            {
-                "attachments": [
-                {
-                    "fallback": "TEST SBVT Backend Deployment",
-                    "color": "good",
-                    "pretext": "TEST SBVT Backend Deployment",
-                    "fields": [
-                    {
-                        "title": "Author",
-                        "value": "${{ inputs.commit-author }}",
-                        "short": true
-                    },
-                    {
-                        "title": "Environment",
-                        "value": "${{ inputs.env-name }}",
-                        "short": true
-                    },
-                    {
-                        "title": "Status",
-                        "value": "Running...",
-                        "short": true
-                    },
-                    {
-                        "title": "Commit",
-                        "value": "${{ inputs.commit-author }}",
-                        "short": true
-                    },
-                    {
-                        "title": "Commit Message",
-                        "value": "${{ inputs.commit-message }}",
-                        "short": false
-                    }
-                    ]
-                } ]
-            }
+          {
+            "attachments": [
+              {
+                "fallback": "TEST SBVT Backend Deployment",
+                "color": "good",
+                "pretext": "TEST SBVT Backend Deployment",
+                "fields": [
+                  {
+                    "title": "Author",
+                    "value": "${{ inputs.commit-author }}",
+                    "short": true
+                  },
+                  {
+                    "title": "Environment",
+                    "value": "${{ inputs.env-name }}",
+                    "short": true
+                  },
+                  {
+                    "title": "Status",
+                    "value": "Running...",
+                    "short": true
+                  },
+                  {
+                    "title": "Commit",
+                    "value": "${{ inputs.commit-id }}",
+                    "short": true
+                  },
+                  {
+                    "title": "Commit Message",
+                    "value": "${{ inputs.commit-message }}",
+                    "short": false
+                  }
+                ]
+              }
+            ]
+          }
         env:
-            SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
-        continue-on-error: true  # Continue even if this step fails    
-
+          SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
+      continue-on-error: true
 
     - name: Update job status to Slack channel
       if: ${{ inputs.update-slack == 'true' }}
-      uses: slackapi/slack-github-action@v1.26.0        
+      uses: slackapi/slack-github-action@v1.26.0
       with:
         channel-id: ${{ inputs.channel-id }}
         update-ts: ${{ inputs.message-ts }}
         payload: |
-            SLACK_JSON="{\"attachments\":[{\"fallback\":\"TEST SBVT Backend Deployment\",\"color\":\"danger\",\"pretext\":\"TEST SBVT Backend Deployment\",\"fields\":[{\"title\":\"Author\",\"value\":\"$AUTHOR\",\"short\":true},{\"title\":\"Environment\",\"value\":\"$FAROS_ENV\",\"short\":true},{\"title\":\"Status\",\"value\":\"FAILED in Deployment\",\"short\":true},{\"title\":\"Commit\",\"value\":\"$COMMIT_ID\",\"short\":true},{\"title\":\"Commit Message\",\"value\":\"$COMMIT_MESSAGE\",\"short\":false}]}]}"
-            if [ "${{ inputs.job-status }}" == "success" ]; then
-                SLACK_JSON="{\"attachments\":[{\"fallback\":\"TEST SBVT Backend Deployment\",\"color\":\"good\",\"pretext\":\"TEST SBVT Backend Deployment\",\"fields\":[{\"title\":\"Author\",\"value\":\"$AUTHOR\",\"short\":true},{\"title\":\"Environment\",\"value\":\"$FAROS_ENV\",\"short\":true},{\"title\":\"Status\",\"value\":\"OK\",\"short\":true},{\"title\":\"Commit\",\"value\":\"$COMMIT_ID\",\"short\":true},{\"title\":\"Commit Message\",\"value\":\"$COMMIT_MESSAGE\",\"short\":false}]}]}"
-            fi
-            echo "$SLACK_JSON"
-    env:
+          SLACK_JSON="{\"attachments\":[{\"fallback\":\"TEST SBVT Backend Deployment\",\"color\":\"danger\",\"pretext\":\"TEST SBVT Backend Deployment\",\"fields\":[{\"title\":\"Author\",\"value\":\"$AUTHOR\",\"short\":true},{\"title\":\"Environment\",\"value\":\"$FAROS_ENV\",\"short\":true},{\"title\":\"Status\",\"value\":\"FAILED in Deployment\",\"short\":true},{\"title\":\"Commit\",\"value\":\"$COMMIT_ID\",\"short\":true},{\"title\":\"Commit Message\",\"value\":\"$COMMIT_MESSAGE\",\"short\":false}]}]}"
+          if [ "${{ inputs.job-status }}" == "success" ]; then
+              SLACK_JSON="{\"attachments\":[{\"fallback\":\"TEST SBVT Backend Deployment\",\"color\":\"good\",\"pretext\":\"TEST SBVT Backend Deployment\",\"fields\":[{\"title\":\"Author\",\"value\":\"$AUTHOR\",\"short\":true},{\"title\":\"Environment\",\"value\":\"$FAROS_ENV\",\"short\":true},{\"title\":\"Status\",\"value\":\"OK\",\"short\":true},{\"title\":\"Commit\",\"value\":\"$COMMIT_ID\",\"short\":true},{\"title\":\"Commit Message\",\"value\":\"$COMMIT_MESSAGE\",\"short\":false}]}]}"
+          fi
+          echo "$SLACK_JSON"
+      env:
         SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
         AUTHOR: ${{ inputs.commit-author }}
         FAROS_ENV: ${{ inputs.env-name }}
         COMMIT_ID: ${{ inputs.commit-id }}
         COMMIT_MESSAGE: ${{ inputs.commit-message }}
-    continue-on-error: true  # Continue even if this step fails 
-
-
+      continue-on-error: true
