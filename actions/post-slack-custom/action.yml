@@ -77,8 +77,8 @@ runs:
               }
             ]
           }
-        env:
-          SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
+      env:
+        SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
       continue-on-error: true
 
     - name: Update job status to Slack channel
