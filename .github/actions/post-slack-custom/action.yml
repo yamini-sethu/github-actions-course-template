@@ -33,9 +33,8 @@ inputs:
 
 runs:
   using: 'composite'
-  steps:
-    
-    - name: Post to Slack channel
+  steps:    
+    - name: Post to Slack channel2222
       run: "echo 'Posting to Slack'"
 
 
